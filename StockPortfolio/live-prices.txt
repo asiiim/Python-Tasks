@@ -1,0 +1,9 @@
+CCL,Coca Cola Group,9.59
+WOW,Woolworths,37.32
+NAB,National Australia Bank,18.08
+SGP,Stockland Corporation,3.81
+XRO,Xero,101.37
+APT,Afterpay,81.78
+TLS,Telstra,2.83
+BHP,BHP Group,36.89
+CBA,Commonwealth Bank,65.02
