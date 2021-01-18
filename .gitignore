@@ -24,6 +24,9 @@ odoo/addons/base/maintenance
 install/win32/*.bat
 install/win32/meta.py
 
+# vs code config file
+python-tasks-workspace.code-workspace
+
 # needed only when building for win32
 setup/win32/static/less/
 setup/win32/static/wkhtmltopdf/
