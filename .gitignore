@@ -19,6 +19,9 @@ status
 # pdf
 *.pdf
 
+# manual todo text
+todo.txt
+
 # odoo filestore
 odoo/filestore
 # maintenance migration scripts
