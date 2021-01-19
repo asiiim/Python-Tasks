@@ -1,5 +1,5 @@
 ''' Prompt for the file names '''
-# Todo: Test with another file names
+# TODO: Test with another file names
 trade_history_filename = input("Trade history file (trades.txt): ") or 'trades.txt'
 print(trade_history_filename)
 live_pricedata_filename = input("Live price data file (live-prices.txt): ") or 'live-prices.txt'
@@ -21,6 +21,23 @@ client_ann_income_text = client_ann_income_file.read()
 trade_history_list = trade_history_text.splitlines()
 live_pricedata_list = live_pricedata_text.splitlines()
 client_ann_income_list = client_ann_income_text.splitlines()
+
+''' Learn about string formatting '''
+formatted_row = '{:^15} {:^15} {:^15} {:^15} {:^15}'
+
+# Create list of tuples
+list_of_tuples = []
+for lst in trade_history_list:
+    tple = tuple(lst.split(','))
+    list_of_tuples.append(tple)
+header = ("Code |", "Buy/Sell |", "Date |", "Stock Held |", "Stock Rate")
+print(formatted_row.format(*header))
+separator = ""
+for item in header:
+    separator += ("-" * (len(item) + 7))
+print(separator)
+for row in list_of_tuples:
+    print(formatted_row.format(*row))
 
 # Close the files
 trade_history_file.close()
