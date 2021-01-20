@@ -5,6 +5,7 @@ print(trade_history_filename)
 live_pricedata_filename = input("Live price data file (live-prices.txt): ") or 'live-prices.txt'
 client_ann_income_filename = input("Client's annual income records (income.txt):") or 'income.txt'
 
+
 ''' File handling '''
 # Open files
 trade_history_file = open(trade_history_filename, "r")
@@ -22,6 +23,7 @@ trade_history_list = trade_history_text.splitlines()
 live_pricedata_list = live_pricedata_text.splitlines()
 client_ann_income_list = client_ann_income_text.splitlines()
 
+
 ''' Learn about string formatting '''
 formatted_row = '{:^15} {:^15} {:^15} {:^15} {:^15}'
 
@@ -38,6 +40,24 @@ for item in header:
 print(separator)
 for row in list_of_tuples:
     print(formatted_row.format(*row))
+
+
+''' Build Tabular Data of Client's Portfolio '''
+# Get lists of each ',' comma delimited data from the trade history list
+trade_history_new_list = []
+for data in trade_history_list:
+    sublist = list(data.split(','))
+    trade_history_new_list.append(sublist)
+
+# Get the unique list of stocks appeared in the trade history file
+stock_list = []
+for data in trade_history_new_list:
+    stock_list.append(data[0])
+unique_stock_list = list(set(stock_list))
+
+# Compute units held of each unique stock from the trade file
+# Get the latest share price per unit from the live-prices file
+# Compute the value of each stock
 
 # Close the files
 trade_history_file.close()
