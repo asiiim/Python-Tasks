@@ -24,24 +24,6 @@ live_pricedata_list = live_pricedata_text.splitlines()
 client_ann_income_list = client_ann_income_text.splitlines()
 
 
-''' Learn about string formatting '''
-formatted_row = '{:^15} {:^15} {:^15} {:^15} {:^15}'
-
-# Create list of tuples
-list_of_tuples = []
-for lst in trade_history_list:
-    tple = tuple(lst.split(','))
-    list_of_tuples.append(tple)
-header = ("Code |", "Buy/Sell |", "Date |", "Stock Held |", "Stock Rate")
-print(formatted_row.format(*header))
-separator = ""
-for item in header:
-    separator += ("-" * (len(item) + 7))
-print(separator)
-for row in list_of_tuples:
-    print(formatted_row.format(*row))
-
-
 ''' Build Tabular Data of Client's Portfolio '''
 # Get lists of each ',' comma delimited data from the trade history list
 trade_history_new_list = []
@@ -78,24 +60,36 @@ for stock in unique_stock_list:
             else:
                 raise ValueError(f'Unknown data in the file: {trade_data_list[3]}')
             
-            # Get the live price rate of the share
-            for live_pricedata in live_pricedata_list:
-                # Check if stock is contained in the live price data string
-                if stock in live_pricedata:
-                    # Get the list from the live price string data
-                    live_list = list(live_pricedata.split(','))
-                    share_price_rate = float(live_list[2])
+    # Get the live price rate of the share and its value
+    for live_pricedata in live_pricedata_list:
+        # Check if stock is contained in the live price data string
+        if stock in live_pricedata:
+            # Get the list from the live price string data
+            live_list = list(live_pricedata.split(','))
+            share_price_rate = float(live_list[2])
 
-                    # Compute the share value
-                    if units_held:
-                        value = units_held * share_price_rate
+            # Check if there is any units held for the stock and compute the share value
+            if units_held > 0:
+                value = round(units_held*share_price_rate, 2)
 
-        # TODO Append the computed values in the list of potfolio
+    # Append the computed values in the list of potfolio whose numbers of units are non zero
+    if units_held > 0:
+        portfolio.append([stock, units_held, value])
 
+# Build tabular data of client's portfolio
+formatted_row = '{:>15} {:>15} {:^15}'
+header = ["Stock |", "Units Held |", "Value"]
+print(formatted_row.format(*header))
+separator = ""
+for item in header:
+    separator += ("-" * (len(item) + 7))
+print(separator)
+for row in portfolio:
+    # Add bar between each data in row
+    row_1 = str(row[0]) + ' |'
+    row_2 = str(row[1]) + ' |'
+    print(formatted_row.format(*[row_1, row_2, row[2]]))
 
-
-# Get the latest share price per unit from the live-prices file
-# Compute the value of each stock
 
 # Close the files
 trade_history_file.close()
