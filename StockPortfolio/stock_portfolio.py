@@ -56,6 +56,44 @@ for data in trade_history_new_list:
 unique_stock_list = list(set(stock_list))
 
 # Compute units held of each unique stock from the trade file
+portfolio = []          # Create a list to store the portfolio
+for stock in unique_stock_list:
+
+    # Initiate the variable for the portfolio
+    units_held = 0
+    share_price_rate = 0.0
+    value = 0.0
+
+    for trade_data in trade_history_list:
+        # Check if the stock is contained in the trade data str
+        if stock in trade_data:
+            # Delimit the trade data str in to the list
+            trade_data_list = list(trade_data.split(','))
+
+            # Check if the trade data list contains buy or sell of the share
+            if trade_data_list[1] == 'buy':
+                units_held += int(trade_data_list[3])
+            elif trade_data_list[1] == 'sell':
+                units_held -= int(trade_data_list[3])
+            else:
+                raise ValueError(f'Unknown data in the file: {trade_data_list[3]}')
+            
+            # Get the live price rate of the share
+            for live_pricedata in live_pricedata_list:
+                # Check if stock is contained in the live price data string
+                if stock in live_pricedata:
+                    # Get the list from the live price string data
+                    live_list = list(live_pricedata.split(','))
+                    share_price_rate = float(live_list[2])
+
+                    # Compute the share value
+                    if units_held:
+                        value = units_held * share_price_rate
+
+        # TODO Append the computed values in the list of potfolio
+
+
+
 # Get the latest share price per unit from the live-prices file
 # Compute the value of each stock
 
