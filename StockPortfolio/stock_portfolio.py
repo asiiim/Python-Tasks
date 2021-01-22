@@ -89,6 +89,7 @@ for stock in unique_stock_list:
 # TODO: Add $ in the amounts in the portfolio values. Example: $500
 formatted_row = '{:>15} {:>15} {:^15}'
 header = ["Stock |", "Units Held |", "Value"]
+print("\n(1) Client's Portfolio")
 print(formatted_row.format(*header))
 separator = ""
 
@@ -105,7 +106,9 @@ print(separator)
 
 # Print the total worth of the stocks
 # TODO: Check the rounding precession of the total worth variable
-print('{:>20} {:<20}'.format(*['Total Worth', str(total_worth)]))
+print('{:<20} {:<20}'.format(*['Total Worth', str(total_worth)]))
+print("\n(2) Pie chart of portfolio opens in new window")
+print("\n(3) CGT Report")
 
 # Close the files
 trade_history_file.close()
@@ -115,10 +118,19 @@ client_ann_income_file.close()
 
 ''' Draw Piechart of the Portfolio Data '''
 # Practice with pie charts
-labels = tuple(unique_stock_list)
-explode = (0, 0, 0, 0, 0, 0, 0, 0, 0)
-sizes = [10, 10, 10, 10, 10, 10, 10, 20, 10]
+labels = []
+explode = []
+# Get the sized of the pies of stock for the pie chart
+sizes = []
+
+# TODO: Ensure the stocks in the labels list is in respect with the computed sizes
+for folio in portfolio:
+    labels.append(folio[0])
+    explode.append(0)
+    pie_size = (folio[2] / total_worth) * 100
+    sizes.append(pie_size)
+
 fig, ax = plt.subplots()
-ax.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%', shadow=False, startangle=90)
+ax.pie(sizes, explode=explode, labels=labels, shadow=False, startangle=90)
 ax.axis('equal')
 plt.show()
