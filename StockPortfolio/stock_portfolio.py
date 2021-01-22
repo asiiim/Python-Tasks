@@ -1,5 +1,8 @@
+import matplotlib.pyplot as plt
+
 ''' Prompt for the file names '''
 # TODO: Test with another file names
+# TODO: Handle exception if file name is not matched or not found
 trade_history_filename = input("Trade history file (trades.txt): ") or 'trades.txt'
 print(trade_history_filename)
 live_pricedata_filename = input("Live price data file (live-prices.txt): ") or 'live-prices.txt'
@@ -39,6 +42,7 @@ unique_stock_list = list(set(stock_list))
 
 # Compute units held of each unique stock from the trade file
 portfolio = []          # Create a list to store the portfolio
+total_worth = 0.0       # Total worth of all the stocks
 for stock in unique_stock_list:
 
     # Initiate the variable for the portfolio
@@ -58,10 +62,12 @@ for stock in unique_stock_list:
             elif trade_data_list[1] == 'sell':
                 units_held -= int(trade_data_list[3])
             else:
+                # TODO: Test this exception
                 raise ValueError(f'Unknown data in the file: {trade_data_list[3]}')
             
     # Get the live price rate of the share and its value
     for live_pricedata in live_pricedata_list:
+        # TODO: Check if there are more same stock in the livestock
         # Check if stock is contained in the live price data string
         if stock in live_pricedata:
             # Get the list from the live price string data
@@ -70,28 +76,49 @@ for stock in unique_stock_list:
 
             # Check if there is any units held for the stock and compute the share value
             if units_held > 0:
-                value = round(units_held*share_price_rate, 2)
+                value = round(units_held * share_price_rate, 2)
 
     # Append the computed values in the list of potfolio whose numbers of units are non zero
     if units_held > 0:
         portfolio.append([stock, units_held, value])
 
+    # Sum up the value of all the stocks
+    total_worth += round(value, 2)
+
 # Build tabular data of client's portfolio
+# TODO: Add $ in the amounts in the portfolio values. Example: $500
 formatted_row = '{:>15} {:>15} {:^15}'
 header = ["Stock |", "Units Held |", "Value"]
 print(formatted_row.format(*header))
 separator = ""
+
 for item in header:
     separator += ("-" * (len(item) + 7))
 print(separator)
+
 for row in portfolio:
     # Add bar between each data in row
     row_1 = str(row[0]) + ' |'
     row_2 = str(row[1]) + ' |'
     print(formatted_row.format(*[row_1, row_2, row[2]]))
+print(separator)
 
+# Print the total worth of the stocks
+# TODO: Check the rounding precession of the total worth variable
+print('{:>20} {:<20}'.format(*['Total Worth', str(total_worth)]))
 
 # Close the files
 trade_history_file.close()
 live_pricedata_file.close()
 client_ann_income_file.close()
+
+
+''' Draw Piechart of the Portfolio Data '''
+# Practice with pie charts
+labels = tuple(unique_stock_list)
+explode = (0, 0, 0, 0, 0, 0, 0, 0, 0)
+sizes = [10, 10, 10, 10, 10, 10, 10, 20, 10]
+fig, ax = plt.subplots()
+ax.pie(sizes, explode=explode, labels=labels, autopct='%1.1f%%', shadow=False, startangle=90)
+ax.axis('equal')
+plt.show()
