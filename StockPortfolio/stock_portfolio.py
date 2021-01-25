@@ -1,4 +1,6 @@
 import matplotlib.pyplot as plt
+from datetime import date
+
 
 ''' Prompt for the file names '''
 # TODO: Test with another file names
@@ -10,6 +12,7 @@ client_ann_income_filename = input("Client's annual income records (income.txt):
 
 
 ''' File handling '''
+# TODO: Make a function that handles file
 # Open files
 trade_history_file = open(trade_history_filename, "r")
 live_pricedata_file = open(live_pricedata_filename, "r")
@@ -108,7 +111,21 @@ print(separator)
 # TODO: Check the rounding precession of the total worth variable
 print('{:<20} {:<20}'.format(*['Total Worth', str(total_worth)]))
 print("\n(2) Pie chart of portfolio opens in new window")
+
+
+''' CGT Report Section '''
 print("\n(3) CGT Report")
+
+# Get year to generate file of CGT Report
+cgt_report_year = input("Enter a year to generate CGT Report: ")
+# TODO: Get the fy_start_date and fy_end_date with given year
+# TODO: Get a list of stock during the given year
+# TODO: For each selected stock, get the list of trade history of shares sold in the given year
+# TODO: Get the income information of each stock in given year from the income.txt
+# TODO: Select the tax rate as per the income.
+# TODO: Compute Capital gains & Tax payable for each selected stock
+# TODO: Store each data in the file cgt-report.txt
+
 
 # Close the files
 trade_history_file.close()
