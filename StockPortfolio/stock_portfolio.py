@@ -1,12 +1,38 @@
 import matplotlib.pyplot as plt
 from datetime import date
 
+def compute_tax_rate(list_of_income, year):
+    ''' Compute the tax rate by getting the income of the given year and 
+        respective tax rate group
+    '''
+    annual_gross_income = 0.0
+
+    # Get the annual gross income in that year
+    income_splitted_list = []
+    for income_str in list_of_income:
+        income_splitted_list.append(income_str.split(','))
+    
+    for data in income_splitted_list:
+        if data[0] == year:
+            annual_gross_income = int(data[1])
+            break
+
+    # Return the tax rate
+    if annual_gross_income in range(18201, 37001):
+        return 0.19
+    elif annual_gross_income in range(37001, 90001):
+        return 0.325
+    elif annual_gross_income in range(90001, 180001):
+        return 0.37
+    elif annual_gross_income >= 180001:
+        return 0.45
+    else:
+        return 0
 
 ''' Prompt for the file names '''
 # TODO: Test with another file names
 # TODO: Handle exception if file name is not matched or not found
 trade_history_filename = input("Trade history file (trades.txt): ") or 'trades.txt'
-print(trade_history_filename)
 live_pricedata_filename = input("Live price data file (live-prices.txt): ") or 'live-prices.txt'
 client_ann_income_filename = input("Client's annual income records (income.txt):") or 'income.txt'
 
@@ -32,14 +58,14 @@ client_ann_income_list = client_ann_income_text.splitlines()
 
 ''' Build Tabular Data of Client's Portfolio '''
 # Get lists of each ',' comma delimited data from the trade history list
-trade_history_new_list = []
+trade_history_splitted_list = []
 for data in trade_history_list:
     sublist = list(data.split(','))
-    trade_history_new_list.append(sublist)
+    trade_history_splitted_list.append(sublist)
 
 # Get the unique list of stocks appeared in the trade history file
 stock_list = []
-for data in trade_history_new_list:
+for data in trade_history_splitted_list:
     stock_list.append(data[0])
 unique_stock_list = list(set(stock_list))
 
@@ -109,7 +135,7 @@ print(separator)
 
 # Print the total worth of the stocks
 # TODO: Check the rounding precession of the total worth variable
-print('{:<20} {:<20}'.format(*['Total Worth', str(total_worth)]))
+print('{:>15} {:>15} {:^15}'.format(*['Total Worth', '', str(total_worth)]))
 print("\n(2) Pie chart of portfolio opens in new window")
 
 
@@ -123,18 +149,72 @@ cgt_report_year = input("Enter a year to generate CGT Report: ")
 fy_start_date = date.fromisoformat(str(int(cgt_report_year) - 1) + '-07-01')
 fy_end_date = date.fromisoformat(cgt_report_year + '-06-30')
 
+
 fy = str(int(cgt_report_year) - 1) + "-" + cgt_report_year[2] + cgt_report_year[3]
+# TODO: Check if random value is input
 print(f"CGT report for the {fy} financial year successfully generated and saved in file cgt-report.txt")
 
-# TODO: Get a list of stock during the given year
-# TODO: For each selected stock, get the list of trade history of shares sold in the given year
-# TODO: Get the income information of each stock in given year from the income.txt
-# TODO: Select the tax rate as per the income.
-# TODO: Compute Capital gains & Tax payable for each selected stock
-# TODO: Store each data in the file cgt-report.txt
+# TODO: Get a list of stock sold during the given year
+cgt_list = []
+for trade_data in trade_history_splitted_list:
+    # Check if the share is sold:
+    if trade_data[1] == 'sell':
+        # Get date of the trade
+        trade_date = date.fromisoformat(trade_data[2])
+        
+        # Check if the date is in the given fiscal year
+        if (trade_date >= fy_start_date) and (trade_date <= fy_end_date):
+            # Get the cost base of the stock
+            stock_cost_base = 0.0
+            for data in trade_history_splitted_list:
+                
+                # Ensure the selected stock
+                if data[0] == trade_data[0]:
+                    # Check if share is bought
+                    if data[1] == 'buy':
+                        stock_cost_base = float(data[4])
 
+            # Calulate the capital gains rate
+            # TODO: Check for decimal rounding in each computed values
+            capital_gain_rate = float(trade_data[4]) - stock_cost_base
+            
+            # Get the number of shares sold
+            qty_share_sold = trade_data[3]
+
+            # Calculate Capital Gains
+            capital_gains = capital_gain_rate * float(qty_share_sold)
+
+            if capital_gains > 0:
+                # Get the tax_rate
+                tax_rate = compute_tax_rate(client_ann_income_list, cgt_report_year)
+
+                # Calculate tax payable
+                tax_payable = capital_gains * tax_rate
+
+                # Append the data in the cgt list
+                cgt_list.append([trade_data[0], stock_cost_base, capital_gains, tax_payable])
+
+# Generate formatted string before storing in the file
+cg_report_row_format = '{:>15} {:>15} {:>15} {:>15}'
+cg_report_header = cg_report_row_format.format(*['| Share', '| Cost Base', '| Capital Gains', '| Tax Payable'])
+cg_report_content = cg_report_header + '\n'
+for content in cgt_list:
+    formatted_content = cg_report_row_format.format(*content)
+    cg_report_content += (formatted_content + '\n')
+cg_report_content += '\n'
+
+# TODO: Handle the condition if the created file is already existed
+cg_report_file = open("cg-report.txt", "a")
+if cg_report_file:
+    cg_report_file.write(cg_report_content)
+else:
+    cg_report_file = open("cg-report.txt", "x")
+    cg_report_file.write(cg_report_content)
+
+print("All tasks finished. Have a nice day.")
 
 # Close the files
+cg_report_file.close()
 trade_history_file.close()
 live_pricedata_file.close()
 client_ann_income_file.close()
