@@ -118,7 +118,14 @@ print("\n(3) CGT Report")
 
 # Get year to generate file of CGT Report
 cgt_report_year = input("Enter a year to generate CGT Report: ")
-# TODO: Get the fy_start_date and fy_end_date with given year
+
+# Get the fy_start_date and fy_end_date with given year
+fy_start_date = date.fromisoformat(str(int(cgt_report_year) - 1) + '-07-01')
+fy_end_date = date.fromisoformat(cgt_report_year + '-06-30')
+
+fy = str(int(cgt_report_year) - 1) + "-" + cgt_report_year[2] + cgt_report_year[3]
+print(f"CGT report for the {fy} financial year successfully generated and saved in file cgt-report.txt")
+
 # TODO: Get a list of stock during the given year
 # TODO: For each selected stock, get the list of trade history of shares sold in the given year
 # TODO: Get the income information of each stock in given year from the income.txt
