@@ -72,9 +72,9 @@ def datalist_from_file(filename):
         file.close()
         return content_list
 
-    except FileNotFoundError:
+    except:
         # Check if those inputted file exist
-        print(f"*** Warning *** File '{filename}' not found.")
+        raise FileNotFoundError(f"'{filename}' doesnot exist.")
 
 
 def format_string(str_format, columns_length, content_list, header_list=[], footer_list=[]):
