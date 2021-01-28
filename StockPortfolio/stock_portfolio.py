@@ -5,7 +5,7 @@ def check_file_record_fields_size(expected_size, string_splitted_list, filename)
     if len(string_splitted_list) == expected_size:
         return True
     else:
-        raise ValueError(f"In '{filename}', fields size per record (i.e. {len(string_splitted_list)}) doesnot meet the expected size (i.e.{expected_size}).")
+        raise ValueError(f"In '{filename}', fields size per record (i.e. {len(string_splitted_list)}) doesnot meet the expected size (i.e. {expected_size}).")
 
 
 def check_stock_code_size(expected_code_size, stock_code, filename):
