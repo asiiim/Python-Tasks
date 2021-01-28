@@ -133,7 +133,6 @@ if __name__ == '__main__':
     if live_price_data_redundancy(live_pricedata_list):
         raise ValueError(f"Found duplicate stock codes in '{live_pricedata_filename}'")
 
-    # Check stock code size in live prices data:
     for price_data in live_pricedata_list:
         stock_code = price_data.split(',')
 
@@ -297,7 +296,7 @@ if __name__ == '__main__':
                             # Append the data in the cgt list
                             cgt_list.append([trade_data[0], stock_cost_base, capital_gains, tax_payable])
         else:
-            print('Unable to get client annual income list')
+            raise ValueError('Unable to get client annual income list')
 
         # Generate formatted string before storing in the file
         cg_report_header = ['Share |', 'Cost Base |', 'Capital Gains |', 'Tax Payable']
