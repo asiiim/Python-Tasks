@@ -253,7 +253,6 @@ if __name__ == '__main__':
                                     stock_cost_base = float(data[4])
 
                         # Calulate the capital gains rate
-                        # TODO: Check for decimal rounding in each computed values
                         capital_gain_rate = float(trade_data[4]) - stock_cost_base
                         
                         # Get the number of shares sold
@@ -276,7 +275,6 @@ if __name__ == '__main__':
 
         # Generate formatted string before storing in the file
         cg_report_header = ['Share |', 'Cost Base |', 'Capital Gains |', 'Tax Payable']
-        # TODO: Improve string representation on the content
 
         if cgt_list:
             content = []
@@ -292,7 +290,6 @@ if __name__ == '__main__':
 
             cg_report_content = format_string('{:>15}', 4, content, cg_report_header)
 
-            # TODO: Handle the condition if the created file is already existed
             cg_report_file = open("cg-report.txt", "a")
             if cg_report_file:
                 cg_report_file.write(cg_report_content)
@@ -312,7 +309,6 @@ if __name__ == '__main__':
         # Get the sized of the pies of stock for the pie chart
         sizes = []
 
-        # TODO: Ensure the stocks in the labels list is in respect with the computed sizes
         for folio in portfolio:
             labels.append(folio[0])
             explode.append(0)
