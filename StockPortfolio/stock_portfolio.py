@@ -31,6 +31,10 @@ def compute_tax_rate(list_of_income, year, filename):
     income_splitted_list = []
     for income_str in list_of_income:
         splitted_list = income_str.split(',')
+
+        # Check if the price is non negative
+        check_negative_value(splitted_list[1], filename)
+
         if check_file_record_fields_size(2, splitted_list, filename):
             income_splitted_list.append(splitted_list)
     
@@ -112,6 +116,11 @@ def live_price_data_redundancy(list_of_data):
         return True    
 
 
+def check_negative_value(value, filename):
+    if float(value) < 0.0:
+        raise ValueError(f'Found negative value {value} in "{filename}"')
+
+
 if __name__ == '__main__':
     ''' Prompt for the file names and get content in the respective lists '''
     trade_history_filename = input("Trade history file (trades.txt): ") or 'trades.txt'
@@ -126,8 +135,13 @@ if __name__ == '__main__':
 
     # Check stock code size in live prices data:
     for price_data in live_pricedata_list:
-        stock_code = price_data.split(',')[0]
-        check_stock_code_size(3,stock_code, live_pricedata_filename)
+        stock_code = price_data.split(',')
+
+        # Check if the stock code size is as expected
+        check_stock_code_size(3,stock_code[0], live_pricedata_filename)
+
+        # Check if the price is non negative
+        check_negative_value(stock_code[2], live_pricedata_filename)
     
     client_ann_income_filename = input("Client's annual income records (income.txt):") or 'income.txt'
     client_ann_income_list = datalist_from_file(client_ann_income_filename)
@@ -141,6 +155,10 @@ if __name__ == '__main__':
 
             # Check if the stock code has expected size
             check_stock_code_size(3, sublist[0], trade_history_filename)
+
+            # Check negative share units or price rate
+            check_negative_value(sublist[3], trade_history_filename)
+            check_negative_value(sublist[4], trade_history_filename)
 
             if check_file_record_fields_size(5, sublist, trade_history_filename):
                 trade_history_splitted_list.append(sublist)
@@ -212,10 +230,10 @@ if __name__ == '__main__':
             # Add '|' and '$' in the respective content
             content = []
             for data in portfolio:
-                data[0] += " |"
-                units_held = str(data[1]) + " |"
-                value_data = "$" + str("{:,}".format(data[2]))
-                content.append([data[0], units_held, value_data])
+                stk = data[0] + " |"
+                units = str(data[1]) + " |"
+                val = "$" + str("{:,}".format(data[2]))
+                content.append([stk, units, val])
 
             portfolio_content = format_string('{:>15}', 3, content, header, footer)
             print(portfolio_content) 
@@ -289,12 +307,12 @@ if __name__ == '__main__':
 
             # Pre format content data
             for data in cgt_list:
-                data[0] += " |"
+                shr = data[0] + " |"
                 cost = str(data[1]) + " |"
                 cg = "$" + str("{:,}".format(round(data[2], 2))) + " |"
                 txp = "$" + str("{:,}".format(round(data[3], 2)))
 
-                content.append([data[0], cost, cg, txp])
+                content.append([shr, cost, cg, txp])
 
             cg_report_content = format_string('{:>15}', 4, content, cg_report_header)
 
@@ -304,6 +322,9 @@ if __name__ == '__main__':
             else:
                 cg_report_file = open("cg-report.txt", "x")
                 cg_report_file.write(cg_report_content)
+            
+            # Add new line in file
+            cg_report_file.write("\n")
 
             print("All tasks finished. Have a nice day.")
 
