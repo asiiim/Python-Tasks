@@ -7,6 +7,22 @@ def check_file_record_fields_size(expected_size, string_splitted_list, filename)
     else:
         raise ValueError(f"In '{filename}', fields size per record (i.e. {len(string_splitted_list)}) doesnot meet the expected size (i.e.{expected_size}).")
 
+
+def check_stock_code_size(expected_code_size, stock_code, filename):
+    if len(stock_code) == expected_code_size:
+        return True
+    else:
+        raise ValueError(f"In '{filename}', the stock code size is NOT as expected.")
+
+
+def get_date(str_date, filename):
+    try:
+        date_obj = date.fromisoformat(str_date)
+        return date_obj
+    except:
+        raise ValueError(f"Found invalid date value '{str_date}' in '{filename}")
+
+
 def compute_tax_rate(list_of_income, year, filename):
     ''' Compute the tax rate by getting the income of the given year and 
         respective tax rate group
@@ -86,6 +102,18 @@ def format_string(str_format, columns_length, content_list, header_list=[], foot
     return formatted_string
 
 
+def live_price_data_redundancy(list_of_data):
+    sublist = []
+
+    for data in list_of_data:
+        splitted_data = data.split(',')
+        sublist.append(splitted_data[0])
+
+    # Check if there are unique data in the list
+    if len(sublist) != len(set(sublist)):
+        return True    
+
+
 if __name__ == '__main__':
     ''' Prompt for the file names and get content in the respective lists '''
     trade_history_filename = input("Trade history file (trades.txt): ") or 'trades.txt'
@@ -93,6 +121,10 @@ if __name__ == '__main__':
 
     live_pricedata_filename = input("Live price data file (live-prices.txt): ") or 'live-prices.txt'
     live_pricedata_list = datalist_from_file(live_pricedata_filename)
+
+    # Check if there are more same stock in the livestock
+    if live_price_data_redundancy(live_pricedata_list):
+        raise ValueError(f"Found duplicate stock codes in '{live_pricedata_filename}'")
     
     client_ann_income_filename = input("Client's annual income records (income.txt):") or 'income.txt'
     client_ann_income_list = datalist_from_file(client_ann_income_filename)
@@ -115,6 +147,7 @@ if __name__ == '__main__':
         # Compute units held of each unique stock from the trade file
         portfolio = []          # Create a list to store the portfolio
         total_worth = 0.0       # Total worth of all the stocks
+        
         for stock in unique_stock_list:
 
             # Initiate the variable for the portfolio
@@ -134,13 +167,12 @@ if __name__ == '__main__':
                     elif trade_data_list[1] == 'sell':
                         units_held -= int(trade_data_list[3])
                     else:
-                        # TODO: Test this exception
                         raise ValueError(f'Unknown data in the file: {trade_data_list[3]}')
-                    
-            # Get the live price rate of the share and its value
+
             if live_pricedata_list:
+                # Get the live price rate of the share and its value
                 for live_pricedata in live_pricedata_list:
-                    # TODO: Check if there are more same stock in the livestock
+
                     # Check if stock is contained in the live price data string
                     if stock in live_pricedata:
                         # Get the list from the live price string data
@@ -151,25 +183,33 @@ if __name__ == '__main__':
                         # Check if there is any units held for the stock and compute the share value
                         if units_held > 0:
                             value = round(units_held * share_price_rate, 2)
-
-                # Append the computed values in the list of potfolio whose numbers of units are non zero
-                if units_held > 0:
-                    portfolio.append([stock, units_held, value])
-
-                # Sum up the value of all the stocks
-                total_worth += round(value, 2)
             else:
-                print("Unable to get live price data.")
+                raise ValueError(f"Unable to get live price date from '{live_pricedata_filename}'")
+
+            # Append the computed values in the list of potfolio whose numbers of units are non zero
+            if units_held > 0:
+                portfolio.append([stock, units_held, value])
+
+            # Sum up the value of all the stocks
+            total_worth += value
 
         # Build tabular data of client's portfolio
-        # TODO: Add $ in the amounts in the portfolio values. Example: $500
         header = ["Stock |", "Units Held |", "Value"]
-        footer = ['Total Worth', '', str(total_worth)]
+        footer = ['Total Worth', '', '$' + str("{:,}".format(round(total_worth, 2)))]
         print("\n(1) Client's Portfolio")
 
         # Call method to print the portfolio data in tabular format
         if portfolio:
-            portfolio_content = format_string('{:>15}', 3, portfolio, header, footer)
+
+            # Add '|' and '$' in the respective content
+            content = []
+            for data in portfolio:
+                data[0] += " |"
+                units_held = str(data[1]) + " |"
+                value_data = "$" + str("{:,}".format(data[2]))
+                content.append([data[0], units_held, value_data])
+
+            portfolio_content = format_string('{:>15}', 3, content, header, footer)
             print(portfolio_content) 
         
         print("\n(2) Pie chart of portfolio opens in new window")
@@ -198,7 +238,7 @@ if __name__ == '__main__':
                 # Check if the share is sold:
                 if trade_data[1] == 'sell':
                     # Get date of the trade
-                    trade_date = date.fromisoformat(trade_data[2])
+                    trade_date = get_date(trade_data[2], trade_history_filename)
                     
                     # Check if the date is in the given fiscal year
                     if (trade_date >= fy_start_date) and (trade_date <= fy_end_date):
@@ -235,11 +275,22 @@ if __name__ == '__main__':
             print('Unable to get client annual income list')
 
         # Generate formatted string before storing in the file
-        cg_report_header = ['| Share', '| Cost Base', '| Capital Gains', '| Tax Payable']
+        cg_report_header = ['Share |', 'Cost Base |', 'Capital Gains |', 'Tax Payable']
         # TODO: Improve string representation on the content
 
         if cgt_list:
-            cg_report_content = format_string('{:>15}', 4, cgt_list, cg_report_header)
+            content = []
+
+            # Pre format content data
+            for data in cgt_list:
+                data[0] += " |"
+                cost = str(data[1]) + " |"
+                cg = "$" + str("{:,}".format(round(data[2], 2))) + " |"
+                txp = "$" + str("{:,}".format(round(data[3], 2)))
+
+                content.append([data[0], cost, cg, txp])
+
+            cg_report_content = format_string('{:>15}', 4, content, cg_report_header)
 
             # TODO: Handle the condition if the created file is already existed
             cg_report_file = open("cg-report.txt", "a")
