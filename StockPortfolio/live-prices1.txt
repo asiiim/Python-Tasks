@@ -1,6 +1,5 @@
 CCL,Coca Cola Group,9.59
-CCL,Coca Cola Group,10
-WOW,Woolworths,37.32
+WOQW,Woolworths,37.32
 NAB,National Australia Bank,18.08
 SGP,Stockland Corporation,3.81
 XRO,Xero,101.37
