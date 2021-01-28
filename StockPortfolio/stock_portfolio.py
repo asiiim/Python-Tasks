@@ -9,9 +9,7 @@ def check_file_record_fields_size(expected_size, string_splitted_list, filename)
 
 
 def check_stock_code_size(expected_code_size, stock_code, filename):
-    if len(stock_code) == expected_code_size:
-        return True
-    else:
+    if len(stock_code) != expected_code_size:
         raise ValueError(f"In '{filename}', the stock code size is NOT as expected.")
 
 
@@ -125,6 +123,11 @@ if __name__ == '__main__':
     # Check if there are more same stock in the livestock
     if live_price_data_redundancy(live_pricedata_list):
         raise ValueError(f"Found duplicate stock codes in '{live_pricedata_filename}'")
+
+    # Check stock code size in live prices data:
+    for price_data in live_pricedata_list:
+        stock_code = price_data.split(',')[0]
+        check_stock_code_size(3,stock_code, live_pricedata_filename)
     
     client_ann_income_filename = input("Client's annual income records (income.txt):") or 'income.txt'
     client_ann_income_list = datalist_from_file(client_ann_income_filename)
@@ -135,6 +138,10 @@ if __name__ == '__main__':
         trade_history_splitted_list = []
         for data in trade_history_list:
             sublist = list(data.split(','))
+
+            # Check if the stock code has expected size
+            check_stock_code_size(3, sublist[0], trade_history_filename)
+
             if check_file_record_fields_size(5, sublist, trade_history_filename):
                 trade_history_splitted_list.append(sublist)
 
@@ -177,6 +184,7 @@ if __name__ == '__main__':
                     if stock in live_pricedata:
                         # Get the list from the live price string data
                         live_list = list(live_pricedata.split(','))
+
                         if check_file_record_fields_size(3, live_list, live_pricedata_filename):
                             share_price_rate = float(live_list[2])
 
