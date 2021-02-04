@@ -19,42 +19,40 @@ class HashTable:
         # Get the bucket corresponding to the generated index
         bucket = self.hash_table[hashed_key]
 
-        found_key = False
         for index, rec in enumerate(bucket):
             rec_key, rec_value = rec
 
             # Check if the key to be inserted already exists in the bucket
             if rec_key == key:
-                found_key = True
-                break
-
-        # Update the key value if existing key found else append it in the bucket
-        if found_key:
-            bucket[index] = (key, value)
-
-        else:
-            bucket.append((key, value))
+                bucket[index] = (key, value)
+                return
+            else:
+                bucket.append((key, value))
+                return
 
     
     # Search the value and return it with specific key
     def get_value(self, key):
-        
-        # Use hash method to get the index from the key
         hashed_key = hash(key) % self.size
-
         bucket = self.hash_table[hashed_key]
 
-        found_key = False
-        rec_value = None
         for index, rec in enumerate(bucket):
             rec_key, rec_value = rec
 
             if rec_key == key:
-                found_key = True
-                break
+                return rec_value
+            else:
+                return "Not Found."
 
-        if found_key:
-            return rec_value
-        else:
-            return "Not Found."
- 
+
+    # Remove value of the specific key 
+    def remove_value(self, key):
+        hashed_key = hash(key) % self.size
+        bucket = self.hash_table[hashed_key]
+
+        for index, rec in enumerate(bucket):
+            rec_key, rec_value = rec
+
+            if rec_key == key:
+                bucket.pop[index]
+                return
