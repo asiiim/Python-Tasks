@@ -1,14 +1,15 @@
 class HashTable:
 
     # Lets create empty list of given size
-
     def __init__(self, size):
         self.size = size
         self.hash_table = self.create_buckets()
 
+    
     def create_buckets(self):
         return [[] for _ in range(self.size)]
 
+    
     # Set value in the hash maps
     def set_value(self, key, value):
         
@@ -33,4 +34,27 @@ class HashTable:
 
         else:
             bucket.append((key, value))
+
+    
+    # Search the value and return it with specific key
+    def get_value(self, key):
+        
+        # Use hash method to get the index from the key
+        hashed_key = hash(key) % self.size
+
+        bucket = self.hash_table[hashed_key]
+
+        found_key = False
+        rec_value = None
+        for index, rec in enumerate(bucket):
+            rec_key, rec_value = rec
+
+            if rec_key == key:
+                found_key = True
+                break
+
+        if found_key:
+            return rec_value
+        else:
+            return "Not Found."
  
