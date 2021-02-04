@@ -16,42 +16,38 @@ class HashTable:
         
         # Using hash method to generate index from the given key
         hashed_key = hash(key) % self.size
-        logging.warning(hashed_key)
 
         # Get the bucket corresponding to the generated index
         bucket = self.hash_table[hashed_key]
-        logging.warning(bucket)
 
         gotten = False
         for index, rec in enumerate(bucket):
             rec_key, rec_value = rec
-            logging.warning("For loop !")
-            logging.warning(rec)
 
             # Check if the key to be inserted already exists in the bucket
             if rec_key == key:
-                logging.warning("Found !")
                 gotten = True
                 bucket[index] = (key, value)
-                return
+                return "Updated !"
 
         if not gotten:
             bucket.append((key, value))
-            logging.warning("Appending !")
-            return
+            return "Value is set !"
     
     # Search the value and return it with specific key
     def get_value(self, key):
         hashed_key = hash(key) % self.size
         bucket = self.hash_table[hashed_key]
 
+        gotten = False
         for index, rec in enumerate(bucket):
             rec_key, rec_value = rec
 
             if rec_key == key:
+                gotten = True
                 return rec_value
-            else:
-                return "Not Found."
+        if not gotten:
+            return "Not Found."
 
 
     # Remove value of the specific key 
@@ -59,12 +55,16 @@ class HashTable:
         hashed_key = hash(key) % self.size
         bucket = self.hash_table[hashed_key]
 
+        gotten = False
         for index, rec in enumerate(bucket):
             rec_key, rec_value = rec
 
             if rec_key == key:
-                bucket.pop[index]
-                return
+                gotten = True
+                bucket.pop(index)
+                return "Removed."
+        if not gotten:
+            return "No Value to be removed."
 
 
     # Print the items of the hash map
@@ -82,5 +82,11 @@ print(f"{hash_table}\n")
 # Get value and set in the hash table
 key_value = input("Key: ")
 content_value = input("Content: ")
-hash_table.set_value(key_value, content_value)
-print(f"{hash_table}\n")
+print(hash_table.set_value(key_value, content_value))
+
+# Seach with key
+result = hash_table.get_value(key_value)
+print("Gotcha >>> " + str(result))
+
+# Remove with key
+print(hash_table.remove_value(key_value))
